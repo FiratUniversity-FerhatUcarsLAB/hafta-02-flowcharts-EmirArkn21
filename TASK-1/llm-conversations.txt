@@ -1,0 +1,196 @@
+“ATM para çekme sistemi için detaylı pseudocode yazmanı istiyorum. 
+şunları içermeli: PIN doğrulama (3 hak), bakiye kontrolü, tutar 
+kontrolü (20 TL katları), günlük limit kontrolü, işlem tekrarı seçeneği. Tüm 
+adımları BAŞLA, OKU, YAZ, EĞER- 
+İSE, DONGÜ yapılarıyla yaz.
+
+
+
+Elbette! Aşağıda, ATM para çekme sistemi için tüm istenen adımları içeren detaylı pseudocode (yani algoritma mantığında yazılmış sahte kod) örneği bulunmaktadır.
+Kullanılan yapılar: BAŞLA, OKU, YAZ, EĞER-İSE, DEĞİLSE, DÖNGÜ.
+
+💳 ATM PARA ÇEKME SİSTEMİ PSEUDOCODE
+
+BAŞLA
+
+    // --- DEĞİŞKEN TANIMLARI ---
+    tanımla dogruPIN ← 1234
+    tanımla girilenPIN, bakiye, cekilecekTutar, gunlukLimit, cekilenToplam, hak
+    bakiye ← 5000
+    gunlukLimit ← 2000
+    cekilenToplam ← 0
+    hak ← 3
+
+    // --- PIN DOĞRULAMA ---
+    DÖNGÜ hak > 0 İKEN
+        YAZ "Lütfen PIN kodunuzu giriniz: "
+        OKU girilenPIN
+
+        EĞER girilenPIN = dogruPIN İSE
+            YAZ "PIN doğrulandı."
+            ÇIK DÖNGÜDEN
+        DEĞİLSE
+            hak ← hak - 1
+            EĞER hak > 0 İSE
+                YAZ "Hatalı PIN! Kalan deneme hakkı: ", hak
+            DEĞİLSE
+                YAZ "3 kez hatalı giriş yaptınız. Kartınız bloke edildi!"
+                DUR
+            BİTİR
+        BİTİR
+    SON
+
+    // --- PARA ÇEKME İŞLEMİ DÖNGÜSÜ ---
+    DÖNGÜ true İKEN
+        YAZ "Çekmek istediğiniz tutarı giriniz (20 TL katları olmalıdır): "
+        OKU cekilecekTutar
+
+        // --- TUTAR KONTROLÜ ---
+        EĞER cekilecekTutar % 20 ≠ 0 İSE
+            YAZ "Hata: Tutar 20 TL'nin katı olmalıdır!"
+            DEVAM ET DÖNGÜYE
+        BİTİR
+
+        // --- BAKİYE KONTROLÜ ---
+        EĞER cekilecekTutar > bakiye İSE
+            YAZ "Yetersiz bakiye! Mevcut bakiye: ", bakiye, " TL"
+            DEVAM ET DÖNGÜYE
+        BİTİR
+
+        // --- GÜNLÜK LİMİT KONTROLÜ ---
+        EĞER cekilenToplam + cekilecekTutar > gunlukLimit İSE
+            YAZ "Günlük limit aşılamaz! Kalan limit: ", gunlukLimit - cekilenToplam, " TL"
+            DEVAM ET DÖNGÜYE
+        BİTİR
+
+        // --- PARA ÇEKME İŞLEMİ ---
+        bakiye ← bakiye - cekilecekTutar
+        cekilenToplam ← cekilenToplam + cekilecekTutar
+
+        YAZ "İşlem başarılı! Çekilen tutar: ", cekilecekTutar, " TL"
+        YAZ "Kalan bakiye: ", bakiye, " TL"
+        YAZ "Bugün çekilen toplam: ", cekilenToplam, " TL"
+
+        // --- İŞLEM TEKRARI SEÇENEĞİ ---
+        YAZ "Başka bir işlem yapmak istiyor musunuz? (E/H): "
+        OKU cevap
+
+        EĞER cevap = "E" veya cevap = "e" İSE
+            DEVAM ET DÖNGÜYE
+        DEĞİLSE
+            YAZ "Kartınızı almayı unutmayın. İyi günler!"
+            ÇIK DÖNGÜDEN
+        BİTİR
+
+    SON
+
+BİTİR
+
+
+🧠 Özetle bu algoritma:
+
+PIN doğrulaması yapar (3 hak).
+
+Hatalı girişte kullanıcıyı uyarır, 3. denemede sistemi kapatır.
+
+Para çekme işlemi döngü içinde çalışır.
+
+Tutar, bakiye ve günlük limit kontrolü yapılır.
+
+Kullanıcı başka işlem yapmak isterse döngü tekrarlanır, istemezse sistem sonlanır.
+
+İstersen bu pseudocode’u Python, C, ya da Java koduna da çevirebilirim. Hangisinde görmek istersin?
+
+
+
+
+“Bu pseudocode’u Graphviz DOT diline çevir. Başla/Bitir için oval,
+girdi/çıktı için parallelogram, işlem için box, karar için diamond kullan.
+Tüm okları ve etiketleri ekle.”
+
+
+
+Harika — şimdi yukarıdaki ATM para çekme algoritmasını adım adım Graphviz DOT diliyle bir akış diyagramına (flowchart) dönüştürelim.
+Aşağıdaki kod, graphviz veya viz.js gibi araçlarla doğrudan çalıştırılabilir.
+Şekiller şu şekilde eşlendi:
+
+Başla/Bitir → oval (ellipse)
+
+Girdi/Çıktı → paralelkenar (parallelogram)
+
+İşlem → dikdörtgen (box)
+
+Karar → elmas (diamond)
+
+💾 Graphviz DOT Kodu
+
+digraph ATM_Para_Cekme {
+    rankdir=TB;
+    node [fontname="Arial", fontsize=10, style=filled, fillcolor=white];
+
+    // --- Şekil tipleri ---
+    start [label="BAŞLA", shape=ellipse, fillcolor=lightgreen];
+    end [label="BİTİR", shape=ellipse, fillcolor=lightgreen];
+
+    // --- PIN Doğrulama ---
+    init [label="Değişkenleri Başlat\nbakiye=5000, limit=2000, hak=3", shape=box];
+    pin_giris [label="OKU PIN", shape=parallelogram];
+    pin_kontrol [label="PIN doğru mu?", shape=diamond];
+    pin_hata [label="hak = hak - 1", shape=box];
+    pin_hak [label="hak > 0 mı?", shape=diamond];
+    pin_blok [label="Kart Bloke\n(3 kez hatalı)", shape=parallelogram, fillcolor=lightcoral];
+
+    // --- Para çekme döngüsü ---
+    islem_basla [label="İŞLEM BAŞLAT", shape=box];
+    tutar_gir [label="OKU çekilecekTutar", shape=parallelogram];
+    tutar_kontrol [label="Tutar 20 TL katı mı?", shape=diamond];
+    bakiye_kontrol [label="Yeterli bakiye var mı?", shape=diamond];
+    limit_kontrol [label="Günlük limit aşılır mı?", shape=diamond];
+    para_cek [label="bakiye -= tutar\ncekilenToplam += tutar", shape=box];
+    yaz_bilgi [label="YAZ bakiye, çekilen tutar", shape=parallelogram];
+    tekrar [label="Başka işlem yapmak ister misiniz?", shape=diamond];
+    iyi_gunler [label="Kartınızı almayı unutmayın.\nİyi günler!", shape=parallelogram];
+
+    // --- Kenarlar (oklar) ---
+    start -> init -> pin_giris;
+    pin_giris -> pin_kontrol;
+
+    pin_kontrol -> islem_basla [label="Evet"];
+    pin_kontrol -> pin_hata [label="Hayır"];
+
+    pin_hata -> pin_hak;
+    pin_hak -> pin_giris [label="Evet"];
+    pin_hak -> pin_blok [label="Hayır"];
+    pin_blok -> end;
+
+    // --- İşlem döngüsü ---
+    islem_basla -> tutar_gir;
+    tutar_gir -> tutar_kontrol;
+
+    tutar_kontrol -> bakiye_kontrol [label="Evet"];
+    tutar_kontrol -> tutar_gir [label="Hayır\n(Uyar: 20 TL katı olmalı)"];
+
+    bakiye_kontrol -> limit_kontrol [label="Evet"];
+    bakiye_kontrol -> tutar_gir [label="Hayır\n(Uyar: Yetersiz bakiye)"];
+
+    limit_kontrol -> para_cek [label="Hayır\n(Aşmıyor)"];
+    limit_kontrol -> tutar_gir [label="Evet\n(Uyar: Limit aşıldı)"];
+
+    para_cek -> yaz_bilgi -> tekrar;
+
+    tekrar -> tutar_gir [label="Evet"];
+    tekrar -> iyi_gunler [label="Hayır"];
+
+    iyi_gunler -> end;
+}
+
+🧩 Açıklama
+
+Bu grafik:
+
+PIN doğrulama sürecini üst kısımda,
+
+Para çekme döngüsünü alt kısımda,
+
+Her karar adımı için Evet / Hayır etiketli dalları
+gösterir.
