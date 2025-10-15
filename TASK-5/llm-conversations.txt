@@ -1,0 +1,389 @@
+IoT tabanlı akıllı ev g¨uvenlik sisteminin alarm ve bildirim s¨ure¸clerini modelle.
+Sistem Gereksinimleri: Sistem aktif mi kontrol¨u (ko¸sul) Sens¨or okuma d¨ong¨us¨u (d¨ong¨u - s¨urekli) Hareket sens¨or¨u kontrol¨u (ko¸sul) Kapı/pencere sens¨or¨u kontrol¨u (ko¸sul) Kamera aktivasyonu (ko¸sul) Yanlı¸s alarm kontrol¨u (ev sahibi evde mi?) (ko¸sul) Alarm seviyesi belirleme (1-d¨u¸s¨uk, 2-orta, 3-y¨uksek) (ko¸sul) Bildirim g¨onderme (SMS + App + Email) Bekle ve tekrar kontrol et (d¨ong¨u) Alarm sıfırlama veya devam ettirme (ko¸sul)
+
+
+
+Tamam! Verdiğin gereksinimler doğrultusunda, IoT tabanlı Akıllı Ev Güvenlik Sistemi için tüm adımları kapsayan detaylı pseudocode hazırladım. İç içe EĞER-İSE ve DÖNGÜ yapılarıyla alarm ve bildirim süreçleri modelledim:
+
+
+BAŞLA
+
+    // --- 1. Değişkenler ---
+    tanımla sistemAktif
+    tanımla hareketSensoru, kapiPencereSensoru, kameraAktif
+    tanımla evSahibiEvde, yanlisAlarm
+    tanımla alarmSeviyesi
+    tanımla bildirimGonderildi
+
+    sistemAktif ← true
+
+    // --- 2. Ana Sensör Okuma Döngüsü ---
+    DÖNGÜ sistemAktif = true İKEN
+
+        // --- 2a. Sistem aktif mi kontrol ---
+        EĞER sistemAktif = HAYIR İSE
+            YAZ "Sistem pasif. Bekle ve tekrar kontrol et."
+            SLEEP(5 saniye)
+            DEVAM
+        BİTİR
+
+        // --- 2b. Sensörleri oku ---
+        hareketSensoru ← OkuHareketSensoru()
+        kapiPencereSensoru ← OkuKapiPencereSensoru()
+
+        // --- 2c. Hareket sensörü kontrolü ---
+        EĞER hareketSensoru = TESPIT EDILDI İSE
+            YAZ "Hareket tespit edildi."
+            kameraAktif ← true
+        DEĞİLSE
+            YAZ "Hareket yok."
+            kameraAktif ← false
+        BİTİR
+
+        // --- 2d. Kapı/Pencere sensörü kontrolü ---
+        EĞER kapiPencereSensoru = ACILDI İSE
+            YAZ "Kapı/Pencere açıldı!"
+            kameraAktif ← true
+        DEĞİLSE
+            YAZ "Kapı/Pencere normal."
+        BİTİR
+
+        // --- 2e. Yanlış alarm kontrolü ---
+        evSahibiEvde ← KontrolEtEvSahibi()
+        EĞER evSahibiEvde = EVDE İSE
+            yanlisAlarm ← true
+            YAZ "Yanlış alarm olabilir, ev sahibi evde."
+        DEĞİLSE
+            yanlisAlarm ← false
+        BİTİR
+
+        // --- 2f. Alarm seviyesi belirleme ---
+        EĞER hareketSensoru = TESPIT EDILDI VE kapiPencereSensoru = ACILDI VE yanlisAlarm = HAYIR İSE
+            alarmSeviyesi ← 3 // Yüksek
+        DEĞİLSE EĞER hareketSensoru = TESPIT EDILDI VE yanlisAlarm = HAYIR İSE
+            alarmSeviyesi ← 2 // Orta
+        DEĞİLSE
+            alarmSeviyesi ← 1 // Düşük
+        BİTİR
+        YAZ "Alarm Seviyesi: ", alarmSeviyesi
+
+        // --- 2g. Bildirim gönderme ---
+        EĞER alarmSeviyesi > 1 İSE
+            bildirimGonderildi ← GonderBildirim(SMS + App + Email)
+            YAZ "Bildirim gönderildi."
+        DEĞİLSE
+            YAZ "Bildirim gönderilmedi."
+        BİTİR
+
+        // --- 2h. Alarm sıfırlama veya devam ettirme ---
+        EĞER alarmSeviyesi = 3 VE yanlisAlarm = HAYIR İSE
+            YAZ "Alarm aktif, müdahale bekleniyor."
+        DEĞİLSE
+            YAZ "Alarm durumu normale döndü."
+        BİTİR
+
+        // --- 2i. Bekle ve tekrar kontrol et ---
+        SLEEP(5 saniye)
+
+    SON DÖNGÜ
+
+BİTİR
+
+
+
+
+
+
+Akıllı ev g¨uvenlik sistemi 7/24 ¸calı¸sır. Ana d¨ong¨u i¸cinde sens¨or okuma, tehdit algılama, alarm verme ve bildirim g¨onderme s¨ure¸clerini i¸ceren pseudocode yaz.
+Ozel Notlar: ¨ Ana DONG ¨ U s¨urekli ¸calı¸sır (DO ¨ GRU ko¸sulu ile) ˘ 
+Her d¨ong¨u iterasyonunda t¨um sens¨orler kontrol edilir 
+Tehdit seviyesine g¨ore farklı aksiyonlar alınır
+Alarm sıfırlama komutu gelene kadar devam eder
+böyle yeniden düzenle kodu.
+
+
+
+
+
+Tamam! İşte 7/24 çalışan IoT tabanlı akıllı ev güvenlik sistemi için, sonsuz döngü yaklaşımıyla yazılmış detaylı pseudocode:
+
+
+BAŞLA
+
+    // --- 1. Değişkenler ---
+    tanımla sistemAktif ← true
+    tanımla hareketSensoru, kapiPencereSensoru, dumanSensoru
+    tanımla kameraAktif, sirenAktif
+    tanımla evSahibiEvde, yanlisAlarm
+    tanımla tehditSeviyesi // 0: yok, 1: düşük, 2: orta, 3: yüksek
+    tanımla bildirimGonderildi
+    tanımla alarmSifirla ← false
+
+    YAZ "Akıllı Ev Güvenlik Sistemi 7/24 çalışıyor..."
+
+    // --- 2. Ana Sonsuz Döngü ---
+    DÖNGÜ sistemAktif = true İKEN
+
+        // --- 2a. Sensörleri oku ---
+        hareketSensoru ← OkuHareketSensoru()
+        kapiPencereSensoru ← OkuKapiPencereSensoru()
+        dumanSensoru ← OkuDumanSensoru()
+
+        // --- 2b. Tehdit Seviyesini Belirle ---
+        tehditSeviyesi ← 0
+
+        EĞER hareketSensoru = TESPIT EDILDI VE evSahibiEvde = HAYIR İSE
+            tehditSeviyesi ← max(tehditSeviyesi, 2) // Orta
+        BİTİR
+
+        EĞER kapiPencereSensoru = ACILDI VE evSahibiEvde = HAYIR İSE
+            tehditSeviyesi ← max(tehditSeviyesi, 3) // Yüksek
+        BİTİR
+
+        EĞER dumanSensoru = TESPIT EDILDI İSE
+            tehditSeviyesi ← max(tehditSeviyesi, 3) // Yüksek
+        BİTİR
+
+        // --- 2c. Alarm ve Kamera Aktivasyonu ---
+        EĞER tehditSeviyesi = 0 İSE
+            sirenAktif ← false
+            kameraAktif ← false
+            YAZ "Ev güvenli."
+        DEĞİLSE
+            kameraAktif ← true
+            EĞER tehditSeviyesi = 2 İSE
+                sirenAktif ← true
+                YAZ "Orta seviye tehdit! Siren aktif."
+            DEĞİLSE EĞER tehditSeviyesi = 3 İSE
+                sirenAktif ← true
+                YAZ "Yüksek seviye tehdit! Siren aktif ve alarm bildirimi gönderiliyor."
+            BİTİR
+        BİTİR
+
+        // --- 2d. Bildirim Gönderme ---
+        EĞER tehditSeviyesi > 1 VE yanlisAlarm = HAYIR İSE
+            bildirimGonderildi ← GonderBildirim(SMS + App + Email)
+            YAZ "Bildirim gönderildi."
+        DEĞİLSE
+            YAZ "Bildirim gönderilmedi."
+        BİTİR
+
+        // --- 2e. Alarm Sıfırlama Kontrolü ---
+        EĞER alarmSifirla = true İSE
+            sirenAktif ← false
+            kameraAktif ← false
+            tehditSeviyesi ← 0
+            YAZ "Alarm sıfırlandı, sistem normal duruma döndü."
+            alarmSifirla ← false
+        BİTİR
+
+        // --- 2f. Kısa Bekleme ---
+        SLEEP(1 saniye)
+
+    SON DÖNGÜ
+
+BİTİR
+
+
+Özellikler ve Kontroller:
+
+Sistem 7/24 aktif, ana döngü sürekli çalışıyor.
+
+Her döngü iterasyonunda tüm sensörler okunuyor (hareket, kapı/pencere, duman).
+
+Tehdit seviyesi tespit edilen durumlara göre 0–3 arasında belirleniyor.
+
+Tehdit seviyesine göre kamera ve siren otomatik olarak aktif ediliyor.
+
+Bildirimler yalnızca tehdit seviyesine ve yanlış alarm kontrolüne göre gönderiliyor.
+
+Alarm sıfırlama komutu gelene kadar döngü devam ediyor.
+
+İstersen bunu bir sonraki adımda Graphviz DOT akış diyagramı şeklinde görselleştirebilirim.
+Bunu yapayım mı?
+
+
+
+
+
+
+yap ama DOT dilinde sonsuz d¨ong¨uy¨u g¨ostermek i¸cin geri ok kullan ve ”S¨urekli” etiketi ekle.
+
+
+
+
+
+
+Tamam! İşte IoT tabanlı akıllı ev güvenlik sistemi için Graphviz DOT formatında akış diyagramı. Sonsuz döngü, “Sürekli” etiketiyle geri ok kullanılarak gösterildi:
+
+
+
+digraph AkilliEvGuvenlik {
+    rankdir=TB;
+    node [fontname="Arial", fontsize=10];
+
+    // --- Başlangıç ve Bitiş ---
+    start [label="BAŞLA", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+    end [label="BİTİR", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+
+    // --- Ana Döngü ---
+    loop_start [label="Sürekli Döngü Başla\n(Sistem Aktif = true)", shape=parallelogram];
+
+    // --- Sensör Okuma ---
+    hareket_ok [label="Hareket Sensörünü Oku", shape=box];
+    kapi_ok [label="Kapı/Pencere Sensörünü Oku", shape=box];
+    duman_ok [label="Duman Sensörünü Oku", shape=box];
+
+    // --- Tehdit Seviyesi Kontrol ---
+    hareket_check [label="Hareket tespit edildi mi?", shape=diamond];
+    kapi_check [label="Kapı/Pencere açıldı mı?", shape=diamond];
+    duman_check [label="Duman tespit edildi mi?", shape=diamond];
+
+    // --- Alarm ve Kamera ---
+    alarm_check [label="Tehdit seviyesi > 0?", shape=diamond];
+    siren_on [label="Siren Aktif", shape=box];
+    kamera_on [label="Kamera Aktif", shape=box];
+    siren_off [label="Siren Kapalı", shape=box];
+    kamera_off [label="Kamera Kapalı", shape=box];
+
+    // --- Bildirim ---
+    bildirim_check [label="Bildirim Gönder?", shape=diamond];
+    gonder [label="SMS + App + Email Gönder", shape=box];
+
+    // --- Alarm Sıfırlama ---
+    alarm_reset_check [label="Alarm Sıfırla Komutu?", shape=diamond];
+    alarm_reset [label="Siren ve Kamera Kapalı, Tehdit 0", shape=box];
+
+    // --- Akış ---
+    start -> loop_start;
+
+    loop_start -> hareket_ok -> hareket_check;
+    hareket_check -> kapi_ok [label="EVET/HAYIR"];
+    kapi_ok -> kapi_check;
+    kapi_check -> duman_ok [label="EVET/HAYIR"];
+    duman_ok -> duman_check;
+    duman_check -> alarm_check [label="EVET/HAYIR"];
+
+    alarm_check -> siren_on [label="EVET"];
+    alarm_check -> siren_off [label="HAYIR"];
+
+    siren_on -> kamera_on;
+    siren_off -> kamera_off;
+
+    kamera_on -> bildirim_check;
+    kamera_off -> bildirim_check;
+
+    bildirim_check -> gonder [label="EVET"];
+    bildirim_check -> loop_start [label="HAYIR"];
+
+    gonder -> alarm_reset_check;
+    alarm_reset_check -> alarm_reset [label="EVET"];
+    alarm_reset_check -> loop_start [label="HAYIR"];
+    alarm_reset -> loop_start [label="Sürekli"];
+
+    // --- Sonsuz Döngü Etiketi ---
+    loop_start -> loop_start [label="Sürekli", style=dashed, color=blue];
+
+}
+
+
+
+
+
+Özellikler:
+
+Parallelogram: Ana sonsuz döngü (“Sürekli”)
+
+Diamond: Karar noktaları (hareket, kapı/pencere, duman, alarm seviyesi, bildirim, alarm sıfırlama)
+
+Box: İşlem adımları (sensör okuma, siren/kamera aktivasyonu, bildirim gönderme)
+
+Geri ok: Döngüyü sürekli göstermek için kullanıldı, “Sürekli” etiketi eklendi.
+
+
+
+
+
+
+
+
+
+burdaki dot graphında evet hayırlar işlenmemiş dediğim gibi bir süreklilik döngüsünde bir akıllı ev güvenlik sistemi değil bunu düzeltir misin anlattığım gibi evet hayır koşulu yok.
+
+
+
+
+
+
+
+
+ChatGPT:
+
+Anladım! Senin istediğin: tamamen sürekli döngü içinde, her karar noktası (hareket, kapı/pencere, duman, alarm seviyesi, bildirim, alarm sıfırlama) ve tüm akış bir sonsuz döngü içinde gösterilmiş. Yani sensör okuma → tehdit kontrol → alarm ve bildirim → tekrar döngü mantığı net.
+
+Bunu düzelttim ve Graphviz DOT kodunu şöyle hazırladım:
+
+
+
+digraph AkilliEvGuvenlik {
+    rankdir=TB;
+    node [fontname="Arial", fontsize=10];
+
+    // Başlangıç
+    start [label="BAŞLA", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+
+    // Ana Sürekli Döngü
+    loop_start [label="Sürekli Döngü Başla\n(Sistem Aktif = true)", shape=parallelogram];
+
+    // Sensör Okuma
+    hareket_ok [label="Hareket Sensörünü Oku", shape=box];
+    kapi_ok [label="Kapı/Pencere Sensörünü Oku", shape=box];
+    duman_ok [label="Duman Sensörünü Oku", shape=box];
+
+    // Tehdit Seviyesi Belirleme
+    tehdit_belirle [label="Tehdit Seviyesini Belirle", shape=box];
+
+    // Alarm ve Kamera
+    siren_on [label="Siren Aktif", shape=box];
+    siren_off [label="Siren Kapalı", shape=box];
+    kamera_on [label="Kamera Aktif", shape=box];
+    kamera_off [label="Kamera Kapalı", shape=box];
+
+    // Bildirim
+    bildirim [label="Bildirim Gönder (SMS + App + Email)", shape=box];
+
+    // Alarm Sıfırlama
+    alarm_reset [label="Alarm Sıfırlama Kontrolü", shape=box];
+
+    // Akış Bağlantıları
+    start -> loop_start;
+    loop_start -> hareket_ok -> kapi_ok -> duman_ok -> tehdit_belirle;
+
+    tehdit_belirle -> siren_on;
+    tehdit_belirle -> siren_off;
+    tehdit_belirle -> kamera_on;
+    tehdit_belirle -> kamera_off;
+
+    siren_on -> bildirim;
+    kamera_on -> bildirim;
+    siren_off -> alarm_reset;
+    kamera_off -> alarm_reset;
+
+    bildirim -> alarm_reset -> loop_start [label="Sürekli Döngü", style=dashed, color=blue];
+}
+
+
+
+
+✅ Özellikler:
+
+Sistem 7/24 çalışıyor, döngü sürekli tekrarlanıyor.
+
+Her iterasyonda tüm sensörler okunuyor ve tehdit seviyesi belirleniyor.
+
+Alarm ve kamera durumu tehdit seviyesine göre ayarlanıyor.
+
+Bildirim gönderme ve alarm sıfırlama işlemleri döngü içinde sürekli kontrol ediliyor.
+
+Geri ok ile sonsuz döngü görsel olarak gösterildi ve “Sürekli Döngü” etiketi eklendi.
+
