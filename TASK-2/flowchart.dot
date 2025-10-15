@@ -1,0 +1,203 @@
+digraph E_Ticaret_Sepet_Odeme {
+  rankdir=TB;
+  labelloc="t";
+  label="E-ticaret Sepet Yönetimi ve Ödeme Akışı (Pseudocode -> DOT)";
+
+  node [fontname="Arial", fontsize=10];
+
+  // Shapes: start/end=ellipse, io=parallelogram, proc=box, decision=diamond
+  start [label="BAŞLA", shape=ellipse, fillcolor=lightgoldenrod];
+  end [label="BİTİR", shape=ellipse, fillcolor=lightgoldenrod];
+
+  // 1. Kullanıcı girişi
+  u_init [label="Başlat: Değişkenleri tanımla\n(sepet boş, oturum=false,...)", shape=box];
+  ask_login [label="OKU: 'Kullanıcı girişi yapılacak mı? (E/H)'", shape=parallelogram];
+  decide_login [label="Kullanıcı giriş istiyor mu?", shape=diamond];
+  login_loop_start [label="DÖNGÜ: maksimumDeneme > 0", shape=box];
+  read_email [label="OKU: e-posta/kullanıcı adı", shape=parallelogram];
+  read_pass [label="OKU: şifre", shape=parallelogram];
+  auth_check [label="EĞER: DogrulaKullanici(email,şifre) ?", shape=diamond];
+  login_success [label="İşlem: oturumAcik=true\nsepet ← KullanıcıSepeti yükle", shape=box];
+  login_fail_decr [label="İşlem: maksimumDeneme--", shape=box];
+  login_fail_msg [label="YAZ: 'Giriş başarısız veya kalan deneme mesajı'", shape=parallelogram];
+  guest_continue [label="İşlem: Misafir sepeti oluştur", shape=box];
+  login_block [label="YAZ: 'Giriş başarısız. Lütfen sonra tekrar deneyin.'\nDUR", shape=parallelogram];
+
+  // 2. Ürün ekleme
+  ask_add_product [label="DÖNGÜ Başlat: 'Ürün eklemek ister misiniz? (E/H)'", shape=box];
+  decide_add_product [label="EĞER: ekleCevap = E ?", shape=diamond];
+  read_product [label="OKU: urunID\nOKU: miktar", shape=parallelogram];
+  stock_check [label="EĞER: stok ≥ miktar ?", shape=diamond];
+  reserve_if_logged [label="EĞER: oturumAcik = true ?", shape=diamond];
+  reserve_attempt [label="İşlem: RezerveEt(urunID,miktar,kullanici.id)", shape=box];
+  add_to_cart_logged [label="İşlem: sepet.Ekle(urunID,miktar)\nYAZ: 'Ürün sepete eklendi.'", shape=box];
+  add_to_cart_guest [label="İşlem: sepet.Ekle(session)\nYAZ: 'Ürün (misafir) sepete eklendi.'", shape=box];
+  stock_insufficient_msg [label="YAZ: 'Stok yetersiz'", shape=parallelogram];
+
+  // 3. Sepet görüntüle/güncelle
+  show_cart [label="İşlem: GetirSepetDetay(sepet)\nYAZ: Sepet", shape=box];
+  cart_update_loop [label="DÖNGÜ: Sepet güncelle işlemleri (D/S/V)", shape=box];
+  decide_update_action [label="EĞER: (D/S/V) ?", shape=diamond];
+  read_update [label="OKU: urunID\nOKU: yeniAdet", shape=parallelogram];
+  stock_check_update [label="EĞER: stok ≥ yeniAdet ?", shape=diamond];
+  update_qty [label="İşlem: sepet.GuncelleAdet(urunID,yeniAdet)\nYAZ:'Adet güncellendi.'", shape=box];
+  remove_item [label="İşlem: sepet.Sil(urunID)\nYAZ:'Ürün silindi.'", shape=box];
+
+  // 4. Kupon uygulama
+  ask_coupon [label="OKU: 'Kupon kodu var mı? (E/H)'", shape=parallelogram];
+  decide_coupon [label="EĞER: kuponVar = E ?", shape=diamond];
+  read_coupon [label="OKU: kuponKodu", shape=parallelogram];
+  check_coupon [label="EĞER: KontrolEtKupon(kuponKodu,kullanici,sepet) ?", shape=diamond];
+  apply_coupon [label="İşlem: UygulaKupon(sepet,indirim)\nYAZ:'Kupon uygulandı.'", shape=box];
+  coupon_invalid_msg [label="YAZ: 'Kupon geçersiz veya koşul sağlanmıyor.'", shape=parallelogram];
+
+  // 5. Kargo hesaplama
+  ask_address [label="OKU: 'Teslimat adresi girilsin mi? (E/H)'", shape=parallelogram];
+  decide_address [label="EĞER: adresVar = E ?", shape=diamond];
+  read_address [label="OKU: adres bilgileri", shape=parallelogram];
+  calc_shipping_options [label="İşlem: HesaplaKargoSecenekleri(sepet,adres)\nYAZ: seçenekler", shape=box];
+  read_shipping_choice [label="OKU: kargoSecimi\nİşlem: kargoUcreti = GetirKargoUcreti(...)", shape=parallelogram];
+
+  // 6. Fiyat, vergi, toplam
+  calc_prices [label="İşlem: araToplam = HesaplaAraToplam(sepet)\nvergi = HesaplaVergi(...)\ntoplamTutar hesapla", shape=box];
+  show_summary [label="YAZ: AraToplam, İndirim, Vergi, Kargo, Toplam", shape=parallelogram];
+
+  // 7. Ödeme
+  ask_payment_method [label="OKU: 'Ödeme yöntemi seçiniz'", shape=parallelogram];
+  payment_loop [label="DÖNGÜ: odemeDenemeSayisi < maksimumDeneme", shape=box];
+  decide_payment_method [label="EĞER: odemeYontemi = KrediKartı/Havale/Kapıda/Dijital ?", shape=diamond];
+
+  // payment branches
+  read_card [label="OKU: Kart bilgileri\nİşlem: token = TokenizeKart(...)", shape=parallelogram];
+  card_pay [label="İşlem: OdemeSaglayici.Ode(token,toplamTutar,idempotencyKey)", shape=box];
+  bank_transfer_wait [label="İşlem: HavaleBekleVeOnayla(...)", shape=box];
+  decide_cod_allowed [label="EĞER: KapidaIzinVar(adres) ?", shape=diamond];
+  cod_success [label="İşlem: odemeBasarili=true\nİşlem: odemeId=KAPIDA-...", shape=box];
+  digital_wallet [label="İşlem: DijitalCuzdan.Ode(...)", shape=box];
+  payment_success [label="EĞER: odemeBasarili = true ?", shape=diamond];
+  payment_fail_msg [label="YAZ: 'Ödeme başarısız. Kalan deneme...'", shape=parallelogram];
+  ask_try_other [label="OKU: 'Farklı yöntem denemek ister misiniz? (E/H)'", shape=parallelogram];
+  stop_on_payment_fail [label="YAZ: 'Ödeme işlemi başarısız. Sipariş tamamlanamadı.'\nDUR", shape=parallelogram];
+
+  // 8. Sipariş oluşturma ve stok güncelleme (atomic)
+  begin_tx [label="İşlem: BaşlatTransaction()", shape=box];
+  reduce_stock_loop [label="DÖNGÜ: her bir ürün in sepet", shape=box];
+  check_stock_before_reduce [label="EĞER: stok ≥ ürün.miktar ?", shape=diamond];
+  reduce_stock [label="İşlem: AzaltStok(ürün.id,ürün.miktar)", shape=box];
+  stock_reduce_fail [label="İşlem: başarılı=false\nYAZ:'Stok hatası'", shape=parallelogram];
+  commit_tx [label="İşlem: CommitTransaction()\nİşlem: siparisId = OlusturSiparis(...)\nYAZ:'Sipariş oluşturuldu.'", shape=box];
+  rollback_tx [label="İşlem: RollbackTransaction()\nEĞER odemeBasarili ise BaslatIade(odemeId)", shape=box];
+
+  // 9. Bildirimler ve fatura
+  notify [label="İşlem: GonderSiparisOnayi(email,siparisId)\nOlusturVeSaklaFatura(siparisId)", shape=box];
+
+  // 10. İade kısa akışı
+  refund [label="İşlem: İade talebi → onay, stok geri yatır, iade ödeme sağlayıcı", shape=box];
+
+  // 11. Loglama
+  logging [label="İşlem: Logla(kullanici, sepet, odemeId, siparisId)", shape=box];
+
+  // --- Bağlantılar ---
+  start -> u_init -> ask_login -> decide_login;
+  decide_login -> login_loop_start [label="EVET"];
+  decide_login -> guest_continue [label="HAYIR"];
+
+  login_loop_start -> read_email -> read_pass -> auth_check;
+  auth_check -> login_success [label="EVET"];
+  auth_check -> login_fail_decr [label="HAYIR"];
+  login_fail_decr -> login_fail_msg -> login_loop_start;
+  login_fail_decr -> login_block [label="maksDeneme=0"];
+
+  guest_continue -> ask_add_product;
+  login_success -> ask_add_product;
+
+  // Ürün ekleme akışı
+  ask_add_product -> decide_add_product;
+  decide_add_product -> read_product [label="EVET"];
+  decide_add_product -> show_cart [label="HAYIR"];
+
+  read_product -> stock_check;
+  stock_check -> reserve_if_logged [label="EVET"];
+  stock_check -> stock_insufficient_msg [label="HAYIR"];
+  stock_insufficient_msg -> ask_add_product;
+
+  reserve_if_logged -> reserve_attempt [label="EVET"];
+  reserve_if_logged -> add_to_cart_guest [label="HAYIR"];
+  reserve_attempt -> add_to_cart_logged [label="rezervasyon başarılı"];
+  reserve_attempt -> stock_insufficient_msg [label="rezervasyon başarısız"];
+
+  add_to_cart_logged -> ask_add_product;
+  add_to_cart_guest -> ask_add_product;
+
+  // Sepet işlemleri
+  show_cart -> cart_update_loop;
+  cart_update_loop -> decide_update_action;
+  decide_update_action -> read_update [label="D"];
+  decide_update_action -> remove_item [label="S"];
+  decide_update_action -> ask_coupon [label="V"];
+
+  read_update -> stock_check_update;
+  stock_check_update -> update_qty [label="EVET"];
+  stock_check_update -> stock_insufficient_msg [label="HAYIR"];
+  stock_insufficient_msg -> cart_update_loop;
+  update_qty -> cart_update_loop;
+  remove_item -> cart_update_loop;
+
+  // Kupon
+  ask_coupon -> decide_coupon;
+  decide_coupon -> read_coupon [label="EVET"];
+  decide_coupon -> calc_shipping_options [label="HAYIR"];
+  read_coupon -> check_coupon;
+  check_coupon -> apply_coupon [label="EVET"];
+  check_coupon -> coupon_invalid_msg [label="HAYIR"];
+  apply_coupon -> calc_shipping_options;
+  coupon_invalid_msg -> calc_shipping_options;
+
+  // Kargo
+  calc_shipping_options -> ask_address;
+  ask_address -> decide_address;
+  decide_address -> read_address [label="EVET"];
+  decide_address -> stop_on_payment_fail [label="HAYIR"];
+  read_address -> calc_shipping_options;
+  calc_shipping_options -> read_shipping_choice;
+
+  read_shipping_choice -> calc_prices;
+
+  // Fiyat ve özet
+  calc_prices -> show_summary -> ask_payment_method;
+
+  // Ödeme akışı
+  ask_payment_method -> payment_loop;
+  payment_loop -> decide_payment_method;
+
+  decide_payment_method -> read_card [label="KrediKartı"];
+  decide_payment_method -> bank_transfer_wait [label="Havale"];
+  decide_payment_method -> decide_cod_allowed [label="Kapıda"];
+  decide_payment_method -> digital_wallet [label="DijitalCuzdan"];
+
+  read_card -> card_pay -> payment_success;
+  bank_transfer_wait -> payment_success;
+  digital_wallet -> payment_success;
+
+  decide_cod_allowed -> cod_success [label="EVET"];
+  decide_cod_allowed -> payment_fail_msg [label="HAYIR"];
+
+  payment_success -> begin_tx [label="EVET"];
+  payment_success -> payment_fail_msg [label="HAYIR"];
+
+  payment_fail_msg -> ask_try_other;
+  ask_try_other -> payment_loop [label="EVET"];
+  ask_try_other -> stop_on_payment_fail [label="HAYIR"];
+
+  // Sipariş oluşturma / stok düşme
+  begin_tx -> reduce_stock_loop;
+  reduce_stock_loop -> check_stock_before_reduce;
+  check_stock_before_reduce -> reduce_stock [label="EVET"];
+  check_stock_before_reduce -> stock_reduce_fail [label="HAYIR"];
+
+  reduce_stock -> reduce_stock_loop [label="diğer ürünler"];
+  reduce_stock_loop -> commit_tx [label="tüm ürünler işlendi"];
+  stock_reduce_fail -> rollback_tx -> stop_on_payment_fail;
+
+  commit_tx -> notify -> logging -> refund -> end;
+}
