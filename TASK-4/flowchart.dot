@@ -1,0 +1,61 @@
+digraph DersKayitSistemi {
+    rankdir=TB;
+    node [fontname="Arial", fontsize=10];
+
+    // --- Başlangıç ve Bitiş ---
+    start [label="BAŞLA", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+    end [label="BİTİR", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+
+    // --- Öğrenci Girişi ---
+    login [label="Öğrenci Girişi\n(Öğrenci No + Şifre)", shape=box];
+    login_check [label="Giriş Başarılı?", shape=diamond];
+    login_fail [label="Giriş Başarısız\nSistemden çık", shape=parallelogram];
+
+    // --- Ders Listesi ---
+    ders_listesi [label="Ders Listesi Göster", shape=box];
+    ders_secim_loop [label="Ders Seçim Döngüsü", shape=parallelogram];
+
+    // --- Kontrol Noktaları ---
+    kontenjan_check [label="Kontenjan Boş?", shape=diamond];
+    onkosul_check [label="Ön Koşul Tamam?", shape=diamond];
+    zaman_check [label="Zaman Çakışması?", shape=diamond];
+    kredi_check [label="Kredi Limiti Aşılıyor mu?", shape=diamond];
+    danisman_check [label="Danışman Onayı Gerekli mi?", shape=diamond];
+
+    // --- Ders Ekle/Çıkar ---
+    ders_ekle [label="Ders Ekle", shape=box];
+    ders_cikar [label="Ders Çıkar", shape=box];
+
+    // --- Kayıt Özeti ve Onay ---
+    kayit_ozeti [label="Kayıt Özeti Göster ve Onayla", shape=box];
+
+    // --- Akış ---
+    start -> login;
+    login -> login_check;
+    login_check -> ders_listesi [label="EVET"];
+    login_check -> login_fail [label="HAYIR"];
+
+    ders_listesi -> ders_secim_loop;
+    ders_secim_loop -> kontenjan_check;
+
+    kontenjan_check -> onkosul_check [label="EVET"];
+    kontenjan_check -> ders_secim_loop [label="HAYIR", style=dashed];
+
+    onkosul_check -> zaman_check [label="EVET"];
+    onkosul_check -> ders_secim_loop [label="HAYIR", style=dashed];
+
+    zaman_check -> kredi_check [label="EVET"];
+    zaman_check -> ders_secim_loop [label="HAYIR", style=dashed];
+
+    kredi_check -> danisman_check [label="EVET"];
+    kredi_check -> ders_secim_loop [label="HAYIR", style=dashed];
+
+    danisman_check -> ders_ekle [label="EVET"];
+    danisman_check -> ders_secim_loop [label="HAYIR", style=dashed];
+
+    ders_ekle -> ders_cikar;
+    ders_cikar -> ders_secim_loop;
+
+    ders_secim_loop -> kayit_ozeti [label="Ders seçimi tamamlandı"];
+    kayit_ozeti -> end;
+}
