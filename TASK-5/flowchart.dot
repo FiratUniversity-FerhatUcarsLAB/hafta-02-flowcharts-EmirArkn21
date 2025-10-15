@@ -1,0 +1,46 @@
+digraph AkilliEvGuvenlik {
+    rankdir=TB;
+    node [fontname="Arial", fontsize=10];
+
+    // Başlangıç
+    start [label="BAŞLA", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+
+    // Ana Sürekli Döngü
+    loop_start [label="Sürekli Döngü Başla\n(Sistem Aktif = true)", shape=parallelogram];
+
+    // Sensör Okuma
+    hareket_ok [label="Hareket Sensörünü Oku", shape=box];
+    kapi_ok [label="Kapı/Pencere Sensörünü Oku", shape=box];
+    duman_ok [label="Duman Sensörünü Oku", shape=box];
+
+    // Tehdit Seviyesi Belirleme
+    tehdit_belirle [label="Tehdit Seviyesini Belirle", shape=box];
+
+    // Alarm ve Kamera
+    siren_on [label="Siren Aktif", shape=box];
+    siren_off [label="Siren Kapalı", shape=box];
+    kamera_on [label="Kamera Aktif", shape=box];
+    kamera_off [label="Kamera Kapalı", shape=box];
+
+    // Bildirim
+    bildirim [label="Bildirim Gönder (SMS + App + Email)", shape=box];
+
+    // Alarm Sıfırlama
+    alarm_reset [label="Alarm Sıfırlama Kontrolü", shape=box];
+
+    // Akış Bağlantıları
+    start -> loop_start;
+    loop_start -> hareket_ok -> kapi_ok -> duman_ok -> tehdit_belirle;
+
+    tehdit_belirle -> siren_on;
+    tehdit_belirle -> siren_off;
+    tehdit_belirle -> kamera_on;
+    tehdit_belirle -> kamera_off;
+
+    siren_on -> bildirim;
+    kamera_on -> bildirim;
+    siren_off -> alarm_reset;
+    kamera_off -> alarm_reset;
+
+    bildirim -> alarm_reset -> loop_start [label="Sürekli Döngü", style=dashed, color=blue];
+}
