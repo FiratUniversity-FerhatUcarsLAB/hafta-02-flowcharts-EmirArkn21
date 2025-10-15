@@ -1,0 +1,59 @@
+digraph ATM_Para_Cekme {
+    rankdir=TB;
+    node [fontname="Arial", fontsize=10, style=filled, fillcolor=white];
+
+    // --- Şekil tipleri ---
+    start [label="BAŞLA", shape=ellipse, fillcolor=lightgreen];
+    end [label="BİTİR", shape=ellipse, fillcolor=lightgreen];
+
+    // --- PIN Doğrulama ---
+    init [label="Değişkenleri Başlat\nbakiye=5000, limit=2000, hak=3", shape=box];
+    pin_giris [label="OKU PIN", shape=parallelogram];
+    pin_kontrol [label="PIN doğru mu?", shape=diamond];
+    pin_hata [label="hak = hak - 1", shape=box];
+    pin_hak [label="hak > 0 mı?", shape=diamond];
+    pin_blok [label="Kart Bloke\n(3 kez hatalı)", shape=parallelogram, fillcolor=lightcoral];
+
+    // --- Para çekme döngüsü ---
+    islem_basla [label="İŞLEM BAŞLAT", shape=box];
+    tutar_gir [label="OKU çekilecekTutar", shape=parallelogram];
+    tutar_kontrol [label="Tutar 20 TL katı mı?", shape=diamond];
+    bakiye_kontrol [label="Yeterli bakiye var mı?", shape=diamond];
+    limit_kontrol [label="Günlük limit aşılır mı?", shape=diamond];
+    para_cek [label="bakiye -= tutar\ncekilenToplam += tutar", shape=box];
+    yaz_bilgi [label="YAZ bakiye, çekilen tutar", shape=parallelogram];
+    tekrar [label="Başka işlem yapmak ister misiniz?", shape=diamond];
+    iyi_gunler [label="Kartınızı almayı unutmayın.\nİyi günler!", shape=parallelogram];
+
+    // --- Kenarlar (oklar) ---
+    start -> init -> pin_giris;
+    pin_giris -> pin_kontrol;
+
+    pin_kontrol -> islem_basla [label="Evet"];
+    pin_kontrol -> pin_hata [label="Hayır"];
+
+    pin_hata -> pin_hak;
+    pin_hak -> pin_giris [label="Evet"];
+    pin_hak -> pin_blok [label="Hayır"];
+    pin_blok -> end;
+
+    // --- İşlem döngüsü ---
+    islem_basla -> tutar_gir;
+    tutar_gir -> tutar_kontrol;
+
+    tutar_kontrol -> bakiye_kontrol [label="Evet"];
+    tutar_kontrol -> tutar_gir [label="Hayır\n(Uyar: 20 TL katı olmalı)"];
+
+    bakiye_kontrol -> limit_kontrol [label="Evet"];
+    bakiye_kontrol -> tutar_gir [label="Hayır\n(Uyar: Yetersiz bakiye)"];
+
+    limit_kontrol -> para_cek [label="Hayır\n(Aşmıyor)"];
+    limit_kontrol -> tutar_gir [label="Evet\n(Uyar: Limit aşıldı)"];
+
+    para_cek -> yaz_bilgi -> tekrar;
+
+    tekrar -> tutar_gir [label="Evet"];
+    tekrar -> iyi_gunler [label="Hayır"];
+
+    iyi_gunler -> end;
+}
