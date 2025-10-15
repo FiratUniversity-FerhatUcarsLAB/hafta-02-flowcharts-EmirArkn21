@@ -4,6 +4,7 @@ Universite ders kayıt sisteminin genel akı¸sını a¸cıkla: giri¸s, ders li
 
 
 
+
 Tamam! İşte Üniversite Ders Kayıt Sistemi – Genel Akışın kısa ve anlaşılır açıklaması:
 
 Kullanıcı önce sisteme giriş yapar ve kimliği doğrulanır.
