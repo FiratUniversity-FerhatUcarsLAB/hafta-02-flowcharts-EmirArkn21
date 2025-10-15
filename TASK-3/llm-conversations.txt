@@ -1,0 +1,380 @@
+Mod¨ul 1: Randevu Alma 
+Hastane randevu sistemi i¸cin algoritma: kimlik do˘grulama, poliklinik se¸cimi, doktor listesi g¨or¨unt¨uleme, uygun saatleri g¨osterme, randevu onaylama ve SMS g¨onderme. Pseudocode yaz.
+
+Tamam, aşağıda Hastane Randevu Sistemi – Modül 1: Randevu Alma için istenen pseudocode var. Kullanılan yapılar: BAŞLA / BİTİR, OKU, YAZ, EĞER-İSE, DÖNGÜ ve tüm kontrol noktaları açıkça gösterildi.
+
+
+
+BAŞLA
+
+    // --- 1. Değişkenler ---
+    tanımla tcNo, sifre, kullaniciDogrulandi
+    tanımla poliklinikSecim, doktorListesi, doktorSecim
+    tanımla uygunSaatler, saatSecim
+    tanımla randevuOnay, smsGonderildi
+    tanımla maksimumDeneme ← 3
+
+    kullaniciDogrulandi ← false
+
+    // --- 2. Kimlik Doğrulama ---
+    BAŞLA Kimlik_Dogrulama
+        DÖNGÜ maksimumDeneme > 0 İKEN
+            YAZ "OKU TC No:"
+            OKU tcNo
+            YAZ "OKU Şifre:"
+            OKU sifre
+
+            EĞER DogrulaKullanici(tcNo, sifre) = true İSE
+                kullaniciDogrulandi ← true
+                YAZ "Giriş başarılı."
+                ÇIK DÖNGÜDEN
+            DEĞİLSE
+                maksimumDeneme ← maksimumDeneme - 1
+                EĞER maksimumDeneme > 0 İSE
+                    YAZ "Hatalı giriş. Kalan deneme: ", maksimumDeneme
+                DEĞİLSE
+                    YAZ "Giriş başarısız. Daha sonra tekrar deneyin."
+                    DUR
+                BİTİR
+            BİTİR
+        SON
+    BİTİR Kimlik_Dogrulama
+
+    // --- 3. Poliklinik Seçimi ---
+    BAŞLA Poliklinik_Secimi
+        poliklinikListesi ← GetirPoliklinikler()
+        YAZ "Mevcut Poliklinikler: ", poliklinikListesi
+        YAZ "OKU Seçmek istediğiniz poliklinik ID:"
+        OKU poliklinikSecim
+    BİTİR Poliklinik_Secimi
+
+    // --- 4. Doktor Listesi ve Seçimi ---
+    BAŞLA Doktor_Secimi
+        doktorListesi ← GetirDoktorlar(poliklinikSecim)
+        YAZ "Polikliniğe ait doktorlar: ", doktorListesi
+        YAZ "OKU Doktor ID seçiniz:"
+        OKU doktorSecim
+    BİTİR Doktor_Secimi
+
+    // --- 5. Uygun Saatleri Göster ---
+    BAŞLA Saat_Goruntuleme
+        uygunSaatler ← GetirUygunSaatler(doktorSecim)
+        EĞER uygunSaatler boş DEĞİLSE İSE
+            YAZ "Uygun saatler: ", uygunSaatler
+            YAZ "OKU Saat seçiniz:"
+            OKU saatSecim
+        DEĞİLSE
+            YAZ "Seçilen doktor için uygun saat bulunmamaktadır."
+            DUR
+        BİTİR
+    BİTİR Saat_Goruntuleme
+
+    // --- 6. Randevu Onaylama ---
+    BAŞLA Randevu_Onay
+        randevuOnay ← RandevuOlustur(tcNo, doktorSecim, saatSecim)
+        EĞER randevuOnay = true İSE
+            YAZ "Randevunuz başarıyla oluşturuldu."
+        DEĞİLSE
+            YAZ "Randevu oluşturulamadı. Lütfen tekrar deneyin."
+            DUR
+        BİTİR
+    BİTİR Randevu_Onay
+
+    // --- 7. SMS Gönderme ---
+    BAŞLA SMS_Gonder
+        smsGonderildi ← SMSGonder(tcNo, doktorSecim, saatSecim)
+        EĞER smsGonderildi = true İSE
+            YAZ "Randevu bilgisi SMS ile gönderildi."
+        DEĞİLSE
+            YAZ "SMS gönderilemedi."
+        BİTİR
+    BİTİR SMS_Gonder
+
+BİTİR
+
+
+Kontrol noktaları:
+
+Kimlik doğrulama: maksimum 3 deneme
+
+Poliklinik ve doktor seçiminde kullanıcı yönlendirme
+
+Doktorun uygun saatlerinin kontrolü (boşsa işlem durur)
+
+Randevu oluşturma ve başarısızlık durumları
+
+SMS gönderimi ve bilgilendirme
+
+
+
+Mod¨ul 2: Tahlil Sonu¸cları 
+Tahlil sonucu g¨or¨unt¨uleme sistemi: kimlik do˘grulama, tahlil varlı˘gı
+kontrol¨u, sonu¸c hazır mı kontrol¨u, g¨or¨unt¨uleme veya bekleme mesajı, PDF
+indirme. Pseudocode yaz.
+
+
+
+Tamam, aşağıda Modül 2: Tahlil Sonuçları Görüntüleme Sistemi için pseudocode’u hazırladım. Kullanılan yapılar: BAŞLA / BİTİR, OKU, YAZ, EĞER-İSE, DÖNGÜ, tüm kontrol noktaları açık şekilde belirtilmiş:
+
+BAŞLA
+
+    // --- 1. Değişkenler ---
+    tanımla tcNo, sifre, kullaniciDogrulandi
+    tanımla tahlilListesi, tahlilSecim
+    tanımla sonucHazir, pdfIndirildi
+    tanımla maksimumDeneme ← 3
+
+    kullaniciDogrulandi ← false
+
+    // --- 2. Kimlik Doğrulama ---
+    BAŞLA Kimlik_Dogrulama
+        DÖNGÜ maksimumDeneme > 0 İKEN
+            YAZ "OKU TC No:"
+            OKU tcNo
+            YAZ "OKU Şifre:"
+            OKU sifre
+
+            EĞER DogrulaKullanici(tcNo, sifre) = true İSE
+                kullaniciDogrulandi ← true
+                YAZ "Giriş başarılı."
+                ÇIK DÖNGÜDEN
+            DEĞİLSE
+                maksimumDeneme ← maksimumDeneme - 1
+                EĞER maksimumDeneme > 0 İSE
+                    YAZ "Hatalı giriş. Kalan deneme: ", maksimumDeneme
+                DEĞİLSE
+                    YAZ "Giriş başarısız. Daha sonra tekrar deneyin."
+                    DUR
+                BİTİR
+            BİTİR
+        SON
+    BİTİR Kimlik_Dogrulama
+
+    // --- 3. Tahlil Listesi Kontrol ---
+    BAŞLA Tahlil_Listesi_Kontrol
+        tahlilListesi ← GetirTahliller(tcNo)
+        EĞER tahlilListesi boş DEĞİLSE İSE
+            YAZ "Mevcut tahliller: ", tahlilListesi
+            YAZ "OKU Görüntülemek istediğiniz tahlil ID:"
+            OKU tahlilSecim
+        DEĞİLSE
+            YAZ "Herhangi bir tahlil bulunmamaktadır."
+            DUR
+        BİTİR
+    BİTİR Tahlil_Listesi_Kontrol
+
+    // --- 4. Sonuç Hazır mı Kontrol ---
+    BAŞLA Sonuc_Hazir_Mi
+        sonucHazir ← KontrolEtSonucHazir(tahlilSecim)
+        EĞER sonucHazir = true İSE
+            YAZ "Tahlil sonucu hazır."
+        DEĞİLSE
+            YAZ "Sonuç henüz hazır değil. Lütfen daha sonra tekrar deneyin."
+            DUR
+        BİTİR
+    BİTİR Sonuc_Hazir_Mi
+
+    // --- 5. Sonucu Görüntüleme ---
+    BAŞLA Sonuc_Goruntuleme
+        YAZ "Tahlil sonucu: ", GetirSonuc(tahlilSecim)
+    BİTİR Sonuc_Goruntuleme
+
+    // --- 6. PDF İndirme ---
+    BAŞLA PDF_Indirme
+        pdfIndirildi ← PDFOlusturVeIndir(tahlilSecim)
+        EĞER pdfIndirildi = true İSE
+            YAZ "PDF başarıyla indirildi."
+        DEĞİLSE
+            YAZ "PDF indirilemedi."
+        BİTİR
+    BİTİR PDF_Indirme
+
+BİTİR
+
+
+Kontrol noktaları:
+
+Kimlik doğrulama: maksimum 3 deneme
+
+Tahlil listesi boşsa işlem durur
+
+Seçilen tahlil sonucu hazır değilse kullanıcıya bekleme mesajı gösterilir
+
+PDF indirme işlemi başarılı/başarısız olarak kontrol edilir
+
+
+
+Ana men¨u ile iki mod¨ul¨u birle¸stir.
+
+
+
+
+Tamam! Şimdi Ana Menü ile Modül 1 (Randevu Alma) ve Modül 2 (Tahlil Sonuçları) birleştirilmiş pseudocode’u hazırlayalım. Kullanıcı önce ana menüden seçim yapacak, ardından seçilen modülün akışı çalışacak. Tüm adımlar BAŞLA / BİTİR, OKU, YAZ, EĞER-İSE, DÖNGÜ ile gösterildi:
+
+BAŞLA
+
+    // --- 1. Değişkenler ---
+    tanımla secim
+    tanımla cikis ← false
+
+    DÖNGÜ cikis = false İKEN
+
+        // --- 2. Ana Menü ---
+        YAZ "Ana Menü:"
+        YAZ "1 - Randevu Alma"
+        YAZ "2 - Tahlil Sonuçlarını Görüntüleme"
+        YAZ "3 - Çıkış"
+        YAZ "OKU Seçiminizi yapınız (1/2/3):"
+        OKU secim
+
+        EĞER secim = 1 İSE
+            // --- Modül 1: Randevu Alma ---
+            BAŞLA Randevu_Alma
+
+                // Kimlik doğrulama
+                BAŞLA Kimlik_Dogrulama
+                    // (Modül 1 pseudocode’daki kimlik doğrulama adımları)
+                BİTİR Kimlik_Dogrulama
+
+                // Poliklinik ve doktor seçimi
+                BAŞLA Poliklinik_ve_Doktor
+                    // Poliklinik seçimi, doktor listesi, uygun saatleri gösterme
+                BİTİR Poliklinik_ve_Doktor
+
+                // Randevu oluşturma ve SMS
+                BAŞLA Randevu_Onay_ve_SMS
+                    // Randevu onaylama, SMS gönderme
+                BİTİR Randevu_Onay_ve_SMS
+
+            BİTİR Randevu_Alma
+
+        DEĞİLSE EĞER secim = 2 İSE
+            // --- Modül 2: Tahlil Sonuçları ---
+            BAŞLA Tahlil_Sonuclari
+
+                // Kimlik doğrulama
+                BAŞLA Kimlik_Dogrulama
+                    // (Modül 2 pseudocode’daki kimlik doğrulama adımları)
+                BİTİR Kimlik_Dogrulama
+
+                // Tahlil listesi ve sonuç kontrolü
+                BAŞLA Tahlil_Secimi_ve_Sonuc
+                    // Tahlil listesi gösterme, sonuç hazır mı kontrolü
+                    // Sonucu görüntüleme ve PDF indirme
+                BİTİR Tahlil_Secimi_ve_Sonuc
+
+            BİTİR Tahlil_Sonuclari
+
+        DEĞİLSE EĞER secim = 3 İSE
+            cikis ← true
+            YAZ "Sistemden çıkılıyor..."
+        DEĞİLSE
+            YAZ "Geçersiz seçim. Lütfen tekrar deneyin."
+
+    SON DÖNGÜ
+
+BİTİR
+
+
+Özellikler ve Kontroller:
+
+Kullanıcı ana menü üzerinden modüller arasında seçim yapabilir.
+
+Her modül kendi kimlik doğrulama ve işlem akışına sahiptir.
+
+Kullanıcı çıkış seçeneğini seçene kadar menü döngüsü devam eder.
+
+Her modülde tüm kontrol noktaları (kimlik, uygun saat, tahlil hazır mı, PDF indirme) korunmuştur.
+
+İstersen bir sonraki adımda bunu Graphviz DOT formatında tek bir akış diyagramı haline getirip hem modül 1 hem modül 2 ile ana menüyü görselleştirebilirim. Bunu yapayım mı?
+
+
+
+
+yap
+
+
+
+
+ChatGPT:
+
+Tamam! Aşağıda Ana Menü + Modül 1 (Randevu Alma) + Modül 2 (Tahlil Sonuçları) akışını Graphviz DOT formatında birleştirilmiş şekilde hazırladım. rankdir=TB kullanıldı, karar noktalarında EVET/HAYIR etiketleri yer alıyor:
+
+digraph Hastane_Sistemi {
+    rankdir=TB;
+    labelloc="t";
+    label="Hastane Sistemi Akış Diyagramı (Ana Menü + Modüller)";
+    node [fontname="Arial", fontsize=10];
+
+    // --- Ana Menü ---
+    start [label="BAŞLA", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+    end [label="BİTİR", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+    menu [label="Ana Menü:\n1-Randevu Alma\n2-Tahlil Sonuçları\n3-Çıkış", shape=parallelogram];
+
+    // --- Modül 1: Randevu Alma ---
+    m1_start [label="Modül 1 Başla\n(Randevu Alma)", shape=ellipse, style=filled, fillcolor=lightblue];
+    m1_login [label="Kimlik Doğrulama\n(max 3 deneme)", shape=diamond];
+    m1_login_success [label="Giriş Başarılı", shape=box];
+    m1_login_fail [label="Giriş Başarısız\nDUR", shape=parallelogram];
+    m1_poliklinik [label="Poliklinik Seçimi", shape=box];
+    m1_doktor [label="Doktor Listesi ve Seçimi", shape=box];
+    m1_saat [label="Uygun Saatleri Göster", shape=diamond];
+    m1_saat_secim [label="Saat Seçimi", shape=box];
+    m1_randevu [label="Randevu Oluşturma", shape=diamond];
+    m1_sms [label="SMS Gönderme", shape=box];
+
+    // --- Modül 2: Tahlil Sonuçları ---
+    m2_start [label="Modül 2 Başla\n(Tahlil Sonuçları)", shape=ellipse, style=filled, fillcolor=lightgreen];
+    m2_login [label="Kimlik Doğrulama\n(max 3 deneme)", shape=diamond];
+    m2_login_success [label="Giriş Başarılı", shape=box];
+    m2_login_fail [label="Giriş Başarısız\nDUR", shape=parallelogram];
+    m2_tahlil_var [label="Tahlil Var mı?", shape=diamond];
+    m2_sonuc_hazir [label="Sonuç Hazır mı?", shape=diamond];
+    m2_goruntule [label="Sonucu Görüntüle", shape=box];
+    m2_pdf [label="PDF İndir", shape=box];
+
+    // --- Ana Menü Okları ---
+    start -> menu;
+    menu -> m1_start [label="1"];
+    menu -> m2_start [label="2"];
+    menu -> end [label="3"];
+
+    // --- Modül 1 Akışı ---
+    m1_start -> m1_login;
+    m1_login -> m1_login_success [label="EVET"];
+    m1_login -> m1_login_fail [label="HAYIR"];
+    m1_login_success -> m1_poliklinik;
+    m1_poliklinik -> m1_doktor;
+    m1_doktor -> m1_saat;
+    m1_saat -> m1_saat_secim [label="EVET"];
+    m1_saat -> m1_login_fail [label="HAYIR"];
+    m1_saat_secim -> m1_randevu;
+    m1_randevu -> m1_sms [label="EVET"];
+    m1_randevu -> m1_login_fail [label="HAYIR"];
+    m1_sms -> menu;
+
+    // --- Modül 2 Akışı ---
+    m2_start -> m2_login;
+    m2_login -> m2_login_success [label="EVET"];
+    m2_login -> m2_login_fail [label="HAYIR"];
+    m2_login_success -> m2_tahlil_var;
+    m2_tahlil_var -> m2_sonuc_hazir [label="EVET"];
+    m2_tahlil_var -> m2_login_fail [label="HAYIR"];
+    m2_sonuc_hazir -> m2_goruntule [label="EVET"];
+    m2_sonuc_hazir -> m2_login_fail [label="HAYIR"];
+    m2_goruntule -> m2_pdf;
+    m2_pdf -> menu;
+}
+
+
+Özellikler:
+
+Ana Menü üzerinden Modül 1 veya Modül 2 seçilebiliyor.
+
+Her modül kendi kimlik doğrulama ve işlem akışına sahip.
+
+Karar noktalarında EVET/HAYIR etiketleri mevcut.
+
+İşlem bittiğinde kullanıcı tekrar ana menüye dönebilir veya çıkış yapabilir.
+
+
