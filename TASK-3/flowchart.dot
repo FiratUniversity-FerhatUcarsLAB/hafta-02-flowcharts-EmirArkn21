@@ -1,0 +1,65 @@
+digraph Hastane_Sistemi {
+    rankdir=TB;
+    labelloc="t";
+    label="Hastane Sistemi Akış Diyagramı (Ana Menü + Modüller)";
+    node [fontname="Arial", fontsize=10];
+
+    // --- Ana Menü ---
+    start [label="BAŞLA", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+    end [label="BİTİR", shape=ellipse, style=filled, fillcolor=lightgoldenrod];
+    menu [label="Ana Menü:\n1-Randevu Alma\n2-Tahlil Sonuçları\n3-Çıkış", shape=parallelogram];
+
+    // --- Modül 1: Randevu Alma ---
+    m1_start [label="Modül 1 Başla\n(Randevu Alma)", shape=ellipse, style=filled, fillcolor=lightblue];
+    m1_login [label="Kimlik Doğrulama\n(max 3 deneme)", shape=diamond];
+    m1_login_success [label="Giriş Başarılı", shape=box];
+    m1_login_fail [label="Giriş Başarısız\nDUR", shape=parallelogram];
+    m1_poliklinik [label="Poliklinik Seçimi", shape=box];
+    m1_doktor [label="Doktor Listesi ve Seçimi", shape=box];
+    m1_saat [label="Uygun Saatleri Göster", shape=diamond];
+    m1_saat_secim [label="Saat Seçimi", shape=box];
+    m1_randevu [label="Randevu Oluşturma", shape=diamond];
+    m1_sms [label="SMS Gönderme", shape=box];
+
+    // --- Modül 2: Tahlil Sonuçları ---
+    m2_start [label="Modül 2 Başla\n(Tahlil Sonuçları)", shape=ellipse, style=filled, fillcolor=lightgreen];
+    m2_login [label="Kimlik Doğrulama\n(max 3 deneme)", shape=diamond];
+    m2_login_success [label="Giriş Başarılı", shape=box];
+    m2_login_fail [label="Giriş Başarısız\nDUR", shape=parallelogram];
+    m2_tahlil_var [label="Tahlil Var mı?", shape=diamond];
+    m2_sonuc_hazir [label="Sonuç Hazır mı?", shape=diamond];
+    m2_goruntule [label="Sonucu Görüntüle", shape=box];
+    m2_pdf [label="PDF İndir", shape=box];
+
+    // --- Ana Menü Okları ---
+    start -> menu;
+    menu -> m1_start [label="1"];
+    menu -> m2_start [label="2"];
+    menu -> end [label="3"];
+
+    // --- Modül 1 Akışı ---
+    m1_start -> m1_login;
+    m1_login -> m1_login_success [label="EVET"];
+    m1_login -> m1_login_fail [label="HAYIR"];
+    m1_login_success -> m1_poliklinik;
+    m1_poliklinik -> m1_doktor;
+    m1_doktor -> m1_saat;
+    m1_saat -> m1_saat_secim [label="EVET"];
+    m1_saat -> m1_login_fail [label="HAYIR"];
+    m1_saat_secim -> m1_randevu;
+    m1_randevu -> m1_sms [label="EVET"];
+    m1_randevu -> m1_login_fail [label="HAYIR"];
+    m1_sms -> menu;
+
+    // --- Modül 2 Akışı ---
+    m2_start -> m2_login;
+    m2_login -> m2_login_success [label="EVET"];
+    m2_login -> m2_login_fail [label="HAYIR"];
+    m2_login_success -> m2_tahlil_var;
+    m2_tahlil_var -> m2_sonuc_hazir [label="EVET"];
+    m2_tahlil_var -> m2_login_fail [label="HAYIR"];
+    m2_sonuc_hazir -> m2_goruntule [label="EVET"];
+    m2_sonuc_hazir -> m2_login_fail [label="HAYIR"];
+    m2_goruntule -> m2_pdf;
+    m2_pdf -> menu;
+}
